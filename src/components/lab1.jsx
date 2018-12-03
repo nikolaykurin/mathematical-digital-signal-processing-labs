@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
-import { Row, Col, Form, FormGroup, Input, Label, Button } from 'reactstrap';
+import { TabContent, TabPane, Nav, NavItem, NavLink, Row, Col, Form, FormGroup, Input, Label, Button } from 'reactstrap';
 import Harmonic from './lab1/harmonic';
-import { Line } from 'react-chartjs-2';
+import { Scatter } from 'react-chartjs-2';
 import { getDefaultHarmonic } from '../utils/harmonics';
 
+import classnames from 'classnames';
 import '../assets/css/styles.css';
+
+const SCALE = 500;
 
 // https://github.com/jerairrest/react-chartjs-2
 class Lab1 extends Component {
@@ -13,76 +16,132 @@ class Lab1 extends Component {
     super(props);
 
     this.state = {
+      activeTab: '1',
+
       harmonics: [
         // amplitude, frequency, phase
       ],
       noiseAmplitude: 0,
-      signalLength: 1000,
-      samplingPeriod: 0.1,
+      signalLength: 400,
+      samplingPeriod: 0.2,
 
       data: []
     };
 
+    this.toggleTab = this.toggleTab.bind(this);
+
     this.addHarmonic = this.addHarmonic.bind(this);
     this.changeHarmonic = this.changeHarmonic.bind(this);
-    this.changeNoiseAmplitude = this.changeHarmonic.bind(this);
-    this.changeSignalLength = this.changeHarmonic.bind(this);
-    this.calculateSamplingPeriod = this.changeHarmonic.bind(this);
-    this.calculateData = this.changeHarmonic.bind(this);
+    this.removeHarmonic = this.removeHarmonic.bind(this);
+    this.changeNoiseAmplitude = this.changeNoiseAmplitude.bind(this);
+    this.changeSignalLength = this.changeSignalLength.bind(this);
+    this.calculateSamplingPeriod = this.calculateSamplingPeriod.bind(this);
+    this.calculateData = this.calculateData.bind(this);
   }
 
-  componentWillMount() {
-    this.addHarmonic();
+  async componentWillMount() {
+    await this.addHarmonic();
+    await this.calculateSamplingPeriod();
+    await this.calculateData();
   }
 
-  addHarmonic() {
+  toggleTab(tab) {
+    if (this.state.activeTab !== tab) {
+      this.setState({
+        activeTab: tab
+      });
+    }
+  }
+
+  async addHarmonic() {
     let harmonics = this.state.harmonics;
     harmonics.push(getDefaultHarmonic());
 
     this.setState({
       harmonics
     });
+
+    await this.calculateSamplingPeriod();
+    await this.calculateData();
   }
 
-  changeHarmonic(index, harmonic) {
+  async changeHarmonic(index, harmonic) {
     let harmonics = this.state.harmonics;
     harmonics[index] = harmonic;
 
     this.setState({
       harmonics
     });
+
+    await this.calculateSamplingPeriod();
+    await this.calculateData();
   }
 
-  changeNoiseAmplitude(value) {
+  async removeHarmonic(index) {
+    let harmonics = this.state.harmonics;
+    harmonics.splice(index, 1);
+
     this.setState({
-      noiseAmplitude: value
+      harmonics
     });
+
+    await this.calculateSamplingPeriod();
+    await this.calculateData();
   }
 
-  changeSignalLength(value) {
+  async changeNoiseAmplitude(event) {
     this.setState({
-      signalLength: value
+      noiseAmplitude: event.target.value
     });
+
+    await this.calculateSamplingPeriod();
+    await this.calculateData();
   }
 
-  calculateSamplingPeriod() {
-    let samplingPeriod = 0;
+  async changeSignalLength(event) {
+    this.setState({
+      signalLength: event.target.value
+    });
 
-    // TODO:
+    await this.calculateSamplingPeriod();
+    await this.calculateData();
+  }
+
+  async calculateSamplingPeriod() {
+    let samplingPeriod = 1 / (2 * Math.max.apply(Math, this.state.harmonics.map( item => item.frequency )));
 
     this.setState({
       samplingPeriod
     });
   }
 
-  calculateData() {
+  async calculateData() {
     let data = [];
 
-    // TODO:
+    for (let i = 0; i <= this.state.signalLength; i += this.state.samplingPeriod) {
+      data.push({
+        x: i,
+        y: this.getX(i / SCALE)
+      });
+    }
 
     this.setState({
       data
     });
+  }
+
+  getX(x) {
+    let value = 0;
+    for (let i = 0; i < this.state.harmonics.length; i++) {
+      if (this.state.noiseAmplitude !== 0) {
+        value = value + this.state.harmonics[i].amplitude * Math.cos(Math.PI * 2 * this.state.harmonics[i].frequency * x + this.state.harmonics[i].phase) +
+          Math.random() * (this.state.noiseAmplitude / 2 - (-this.state.noiseAmplitude / 2)) + (-this.state.noiseAmplitude / 2);
+      } else {
+        value = value + this.state.harmonics[i].amplitude * Math.cos(Math.PI * 2 * this.state.harmonics[i].frequency * x + this.state.harmonics[i].phase);
+      }
+    }
+
+    return value;
   }
 
   render() {
@@ -97,6 +156,8 @@ class Lab1 extends Component {
                   this.state.harmonics.map((harmonic, index) => (
                     <Harmonic
                       index={index}
+                      onChange={this.changeHarmonic}
+                      onRemove={this.removeHarmonic}
                       {...harmonic}
                     />
                   ))
@@ -113,26 +174,74 @@ class Lab1 extends Component {
               <div>
                 <FormGroup>
                   <Label for="noiseAmplitude">Noise Amplitude</Label>
-                  <Input type="number" name="noiseAmplitude" id="noiseAmplitude" value={this.state.noiseAmplitude} />
+                  <Input
+                    type="number"
+                    name="noiseAmplitude"
+                    id="noiseAmplitude"
+                    value={this.state.noiseAmplitude}
+                    onChange={this.changeNoiseAmplitude}
+                  />
                 </FormGroup>
               </div>
               <div>
                 <FormGroup>
                   <Label for="signalLength">Signal Length</Label>
-                  <Input type="number" name="signalLength" id="signalLength" value={this.state.signalLength} />
+                  <Input
+                    type="number"
+                    name="signalLength"
+                    id="signalLength"
+                    value={this.state.signalLength}
+                    onChange={this.changeSignalLength}
+                  />
                 </FormGroup>
               </div>
               <div>
                 <FormGroup>
-                  <Label for="samplingPeriod">Sampling Period</Label>
-                  <Input type="number" name="samplingPeriod" id="samplingPeriod" value={this.state.samplingPeriod} />
+                  <Label for="samplingPeriod">Sampling Period (Kotelnikov)</Label>
+                  <Input
+                    type="number"
+                    name="samplingPeriod"
+                    id="samplingPeriod"
+                    value={this.state.samplingPeriod}
+                  />
                 </FormGroup>
               </div>
             </Form>
           </Col>
           <Col md={8}>
             <div>
-              <Line data={this.state.data} />
+              {/*<Scatter data={{ datasets: [{ label: 'Signal', data: this.state.data }] }} />*/}
+
+              <Nav tabs>
+                <NavItem>
+                  <NavLink
+                    className={classnames({ active: this.state.activeTab === '1' })}
+                    onClick={() => { this.toggleTab('1'); }}
+                  >
+                    Graphic
+                  </NavLink>
+                </NavItem>
+                <NavItem>
+                  <NavLink
+                    className={classnames({ active: this.state.activeTab === '2' })}
+                    onClick={() => { this.toggleTab('2'); }}
+                  >
+                    АЧХ
+                  </NavLink>
+                </NavItem>
+              </Nav>
+              <TabContent activeTab={this.state.activeTab}>
+                <TabPane tabId="1">
+                  <Row>
+                    <Scatter data={{ datasets: [{ label: 'Signal', data: this.state.data }] }} />
+                  </Row>
+                </TabPane>
+                <TabPane tabId="2">
+                  <Row>
+                    АЧХ
+                  </Row>
+                </TabPane>
+              </TabContent>
             </div>
           </Col>
         </Row>

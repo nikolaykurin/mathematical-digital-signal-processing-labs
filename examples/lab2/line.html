@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Canvas code example</title>
+<link rel="stylesheet" type="text/css" href="jquery.jqplot.css" />
+<link href='style.css' rel="stylesheet">
+
+
+</head>
+<body>
+	<div id="vvod">
+		<div >
+			<label for="amplitude_noise">Введите длину окна:</label>
+			<input type="text" class="amplitude_noise" value="5">
+		</div>
+		<p>График</p>
+		<p>Первый сигнал</p>
+		<label for="garmoniki">Число гармоник</label>
+		<input type="text" id="garmoniki" value="1" readonly >
+		<button id="add_garmonik">Увеличить гармонику</button>
+		
+		<div class = "afp">
+			<label for="amplitude">Введите амплитуду 1 гармоники</label>		
+			<input type="text" class="amplitude" value="6">
+
+			<label for="frequency">Введите частоту 1 гармоники</label>
+			<input type="text" class="frequency" value="10">
+
+			<label for="phase">Введите фазу 1 гармоники</label>
+			<input type="text" class="phase" value="1">
+		</div>
+		
+		<button id="build_graph">Построить график</button>
+
+		<label for="length_signal">Введите длину сигнала (сек)</label>		
+		<input type="text" class="length_signal" value="0.8">
+		
+		<label for="period">период дескритизации (по т. Котельникова)</label>		
+		<input type="text" class="period" value="0" readonly>
+
+		<button id="add_noise">Добавить шум</button>
+		<div id="noise">
+			<label for="amplitude_noise">Введите амплитуду шума</label>
+			<input type="text" class="amplitude_noise" value="5">
+		</div>
+		<button id="build_power">Построить график мощности</button>
+		<button id="ACH">Построить график АЧХ</button>
+		<button id="FCH">Построить график ФЧХ</button>
+		<button id="filter_henning">Фильтр Хеннинга</button>
+		<button id="filter_parabol">Фильтр параболический</button>
+		<button id="filter_first">Фильтр 1-го порядка</button>
+	</div>
+	
+	<div class="charts" id="chartdiv" style="height:600px;width:800px; "></div>
+	<div class="charts" id="powerdiv" style="height:600px;width:800px; "></div>
+	<div class="charts" id="ACHdiv" style="height:600px;width:800px; "></div>
+	<div class="charts" id="FCHdiv" style="height:600px;width:800px; "></div>
+	<div class="charts" id="Henningdiv" style="height:600px;width:800px; "></div>
+	<div class="charts" id="Paraboldiv" style="height:600px;width:800px; "></div>
+	<div class="charts" id="Firstfilterdiv" style="height:600px;width:800px; "></div>
+</body>
+
+
+<script src="jquery.js"></script>
+<script language="javascript" type="text/javascript" src="jquery.jqplot.min.js"></script>
+<script type="text/javascript" src="jqplot.canvasTextRenderer.min.js"></script>
+<script type="text/javascript" src="jqplot.canvasAxisLabelRenderer.min.js"></script>
+<script src="script.js"></script>
+
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Canvas code example</title>
+<link href='style.css' rel="stylesheet">
+</head>
+<body>
+	<div id="vvod">
+		<p>График</p>
+		<label for="garmoniki">Введите число гармоник</label>
+		<input type="text" id="garmoniki" value="1" readonly >
+		<button id="add_garmonik">Увеличить гармонику</button>
+		<div class = "afp">
+			<label for="amplitude">Введите амплитуду 1 гармоники</label>		
+			<input type="text" class="amplitude" value="6">
+
+			<label for="frequency">Введите частоту 1 гармоники</label>
+			<input type="text" class="frequency" value="10">
+
+			<label for="phase">Введите фазу 1 гармоники</label>
+			<input type="text" class="phase" value="1">
+		</div>
+		
+		<button id="build_graph">Построить график</button>
+
+		<label for="length_signal">Введите длину сигнала (cек * 1000)</label>		
+		<input type="text" class="length_signal" value="800">
+		
+		<label for="period">период дескритизации (по т. Котельникова)</label>		
+		<input type="text" class="period" value="0" readonly>
+
+		<button id="add_noise">Добавить шум</button>
+		<div id="noise">
+			<label for="amplitude_noise">Введите амплитуду шума</label>
+			<input type="text" class="amplitude_noise" value="5">
+		</div>
+		
+	</div>
+	
+	
+	<canvas id="canvas" width="800" height="800"></canvas>
+</body>
+<script src="jquery-2.1.4.min.js"></script>
+<script src="script.js"></script>
+</html>

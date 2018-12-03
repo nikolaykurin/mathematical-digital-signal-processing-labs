@@ -1,0 +1,39 @@
+#vvod{
+	float: left;
+	width: 400px;
+}
+input{
+	display: block;
+	margin: 10px;
+}
+
+#canvas1{
+	float: left;
+}
+
+.afp{
+	margin-top: 20px;
+	padding: 10px 0px 10px 0px;
+	background-color: rgba(200,200,200,0.2);
+	border-radius: 10px;
+}
+
+button{
+	margin-left: 10px;
+	display: block;
+}
+#build_graph{
+	margin-top: 20px;
+	width: 200px;
+	height: 40px;
+	font-size: 18px;
+}
+
+#add_noise{
+	margin-top: 20px;
+}
+
+#noise{
+	margin-top: 10px;
+	display: none;
+}

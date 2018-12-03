@@ -1,0 +1,50 @@
+#vvod{
+	float: left;
+	width: 400px;
+}
+input{
+	display: block;
+	margin: 10px;
+}
+
+
+.afp{
+	margin-top: 20px;
+	padding: 10px 0px 10px 0px;
+	background-color: rgba(200,200,200,0.2);
+	border-radius: 10px;
+}
+
+button{
+	margin-left: 10px;
+	display: block;
+}
+#build_graph{
+	margin-top: 20px;
+	width: 200px;
+	height: 40px;
+	font-size: 18px;
+}
+
+#add_noise{
+	margin-top: 20px;
+	padding: 8px 2px;
+	font-size: 16px;
+}
+
+#noise{
+	margin-top: 10px;
+	display: none;
+	padding: 8px 2px;
+	font-size: 16px;
+}
+
+#ACH, #FCH, #build_power, #AKF, #filter_henning, #filter_parabol, #filter_first{
+	margin-top: 40px;
+	padding: 10px 4px;
+	font-size: 16px;
+}
+.charts {
+	margin-left: 400px;
+	margin-top: 40px;
+}
