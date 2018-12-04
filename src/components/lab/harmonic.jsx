@@ -60,7 +60,7 @@ class Harmonic extends Component {
         </Row>
         <div>
           <FormGroup>
-            <Label for="amplitude">Amplitude</Label>
+            <Label for="amplitude">Амплитуда</Label>
             <Input
               type="number"
               name="amplitude"
@@ -70,7 +70,7 @@ class Harmonic extends Component {
             />
           </FormGroup>
           <FormGroup>
-            <Label for="frequency">Frequency</Label>
+            <Label for="frequency">Частота</Label>
             <Input
               type="number"
               name="frequency"
@@ -80,7 +80,7 @@ class Harmonic extends Component {
             />
           </FormGroup>
           <FormGroup>
-            <Label for="phase">Phase</Label>
+            <Label for="phase">Фаза</Label>
             <Input
               type="number"
               name="phase"

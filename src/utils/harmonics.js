@@ -1,5 +1,5 @@
-export const HARMONIC_DEFAULT_AMPLITUDE = 10;
-export const HARMONIC_DEFAULT_FREQUENCY = 5;
+export const HARMONIC_DEFAULT_AMPLITUDE = 20;
+export const HARMONIC_DEFAULT_FREQUENCY = 10;
 export const HARMONIC_DEFAULT_PHASE = 1;
 
 export const getDefaultHarmonic = () => {
