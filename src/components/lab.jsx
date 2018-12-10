@@ -15,10 +15,11 @@ import {
 } from 'reactstrap';
 import Harmonic from './lab/harmonic';
 import { Scatter } from 'react-chartjs-2';
-import { getDefaultHarmonic } from '../utils/harmonics';
+import {getDefaultHarmonic, getRandomHarmonic} from '../utils/harmonics';
 
 import classnames from 'classnames';
 import '../assets/css/styles.css';
+import {getIntInRange} from "../utils/utils";
 
 const SCALE = 500;
 
@@ -44,7 +45,9 @@ class Lab extends Component {
       phaseFrequencyData: [],
       signalDataHenningFilter: [],
       signalDataParabolicFilter: [],
-      signalDataFirstOrderFilter: []
+      signalDataFirstOrderFilter: [],
+
+      segmentationData: []
     };
 
     this.toggleTab = this.toggleTab.bind(this);
@@ -377,6 +380,90 @@ class Lab extends Component {
     return signalDataFirstOrderFilter;
   }
 
+  makeSegmentation() {
+    let totalSignalLength = 0;
+    let segmentationData = [];
+
+    const calculateSamplingPeriod = (harmonics) => {
+      let samplingPeriod =
+        1 /
+        (2 *
+          Math.max.apply(Math, harmonics.map(item => item.frequency)));
+
+      return samplingPeriod;
+    };
+
+    const calculateSignalData = (harmonics, samplingPeriod, noiseAmplitude, signalLength) => {
+      let signalData = [];
+
+      const getY = x => {
+        let value = 0;
+        for (let i = 0; i < harmonics.length; i++) {
+          if (noiseAmplitude !== 0) {
+            value =
+              value +
+              harmonics[i].amplitude *
+              Math.cos(
+                Math.PI * 2 * harmonics[i].frequency * x +
+                harmonics[i].phase
+              ) +
+              Math.random() *
+              (noiseAmplitude / 2 - -noiseAmplitude / 2) +
+              -noiseAmplitude / 2;
+          } else {
+            value =
+              value +
+              harmonics[i].amplitude *
+              Math.cos(
+                Math.PI * 2 * harmonics[i].frequency * x +
+                harmonics[i].phase
+              );
+          }
+        }
+
+        return value;
+      };
+
+      for (let i = totalSignalLength; i <= signalLength; i += samplingPeriod) {
+        signalData.push({
+          x: i,
+          y: getY(i / SCALE)
+        });
+      }
+
+      return signalData;
+    };
+
+    const segmentsCount = getIntInRange(1, 5);
+
+    for (let segmentIterator = 0; segmentIterator < segmentsCount; segmentIterator++) {
+      const harmonicsCount = getIntInRange(1, 5);
+      const noiseAmplitude = getIntInRange(1, 5);
+      const signalLength = getIntInRange(100, 1000);
+      const fullSignalLength = totalSignalLength + signalLength;
+      let samplingPeriod = 0;
+
+      let harmonics = [];
+      for (let harmonicIterator = 0; harmonicIterator < harmonicsCount; harmonicIterator++) {
+        harmonics.push(getRandomHarmonic());
+      }
+
+      samplingPeriod = calculateSamplingPeriod(harmonics);
+
+      const signalData = calculateSignalData(harmonics, samplingPeriod, noiseAmplitude, fullSignalLength);
+
+      segmentationData.push({
+        harmonics,
+        noiseAmplitude,
+        signalLength,
+        samplingPeriod,
+        signalData
+      });
+
+      totalSignalLength += signalLength;
+    }
+  }
+
   render() {
     return (
       <div>
@@ -538,6 +625,18 @@ class Lab extends Component {
                     Фильтр Первого Порядка
                   </NavLink>
                 </NavItem>
+                <NavItem>
+                  <NavLink
+                    className={classnames({
+                      active: this.state.activeTab === '8'
+                    })}
+                    onClick={() => {
+                      this.toggleTab('8');
+                    }}
+                  >
+                    Сегментация
+                  </NavLink>
+                </NavItem>
               </Nav>
               <TabContent activeTab={this.state.activeTab}>
                 <TabPane tabId="1">
@@ -623,6 +722,20 @@ class Lab extends Component {
                           {
                             label: 'Фильтр Первого Порядка',
                             data: this.state.signalDataFirstOrderFilter
+                          }
+                        ]
+                      }}
+                    />
+                  </Row>
+                </TabPane>
+                <TabPane tabId="8">
+                  <Row>
+                    <Scatter
+                      data={{
+                        datasets: [
+                          {
+                            label: 'Сегментация',
+                            data: [].concat.apply([], this.state.segmentationData.map( item => item.signalData ))
                           }
                         ]
                       }}
