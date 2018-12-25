@@ -15,11 +15,10 @@ import {
 } from 'reactstrap';
 import Harmonic from './lab/harmonic';
 import { Scatter } from 'react-chartjs-2';
-import {getDefaultHarmonic, getRandomHarmonic} from '../utils/harmonics';
-
+import { getDefaultHarmonic, getRandomHarmonic } from '../utils/harmonics';
 import classnames from 'classnames';
 import '../assets/css/styles.css';
-import {getIntInRange} from "../utils/utils";
+import { getIntInRange } from '../utils/utils';
 
 const SCALE = 500;
 
@@ -76,6 +75,7 @@ class Lab extends Component {
       this
     );
     this.makeChanges = this.makeChanges.bind(this);
+    this.makeSegmentation = this.makeSegmentation.bind(this);
   }
 
   async componentWillMount() {
@@ -434,7 +434,7 @@ class Lab extends Component {
       return signalData;
     };
 
-    const segmentsCount = getIntInRange(1, 5);
+    const segmentsCount = getIntInRange(2, 5);
 
     for (let segmentIterator = 0; segmentIterator < segmentsCount; segmentIterator++) {
       const harmonicsCount = getIntInRange(1, 5);
@@ -462,6 +462,43 @@ class Lab extends Component {
 
       totalSignalLength += signalLength;
     }
+
+    console.log(segmentationData);
+
+    this.setState({
+      segmentationData
+    });
+  }
+
+  getSegments(segmentationData) {
+    let x_coordinates = [];
+    let amplitudes = [];
+    let prev_x_coordinate = 0;
+    segmentationData.forEach(datum => {
+      // const dispersion = Math.floor(datum.signalLength / 100);
+      const dispersion = 5;
+      const x_coordinate = datum.signalLength + getIntInRange(-dispersion, dispersion) + prev_x_coordinate;
+
+      x_coordinates.push(x_coordinate);
+      amplitudes.push(...datum.harmonics.map( harmonic => harmonic.amplitude ));
+
+      prev_x_coordinate = x_coordinate;
+    });
+
+    x_coordinates.pop();
+    const max_amplitude = Math.max(...amplitudes) * 5;
+
+    let data = [];
+    x_coordinates.forEach(x => {
+      for (let y = -max_amplitude; y < max_amplitude; y++) {
+        data.push({
+          x,
+          y
+        });
+      }
+    });
+
+    return data;
   }
 
   render() {
@@ -534,6 +571,12 @@ class Lab extends Component {
                   onClick={this.makeChanges}
                 >
                   Применить изменения
+                </Button>
+                <Button
+                  color="primary"
+                  onClick={this.makeSegmentation}
+                >
+                  Построить график сегментации
                 </Button>
               </div>
             </Form>
@@ -734,8 +777,20 @@ class Lab extends Component {
                       data={{
                         datasets: [
                           {
-                            label: 'Сегментация',
+                            type: 'scatter',
+                            label: 'График',
                             data: [].concat.apply([], this.state.segmentationData.map( item => item.signalData ))
+                          },
+                          {
+                            type: 'line',
+                            label: 'Сегменты',
+                            data: this.getSegments(this.state.segmentationData),
+                            borderColor: '#FF0000',
+                            backgroundColor: '#FF0000',
+                            pointBorderColor: '#FF0000',
+                            pointBackgroundColor: '#FF0000',
+                            pointHoverBackgroundColor: '#FF0000',
+                            pointHoverBorderColor: '#FF0000',
                           }
                         ]
                       }}
